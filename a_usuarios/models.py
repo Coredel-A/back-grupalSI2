@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
-from a_especialidades.models import Especialidad
-from a_sucursales.models import Establecimiento
 
 class UsuarioManager(BaseUserManager):
     def create_user(self, email, nombre, apellido, password=None, **extra_fields):
@@ -33,11 +31,11 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
-    fecha_nacimiento = models.DateField()
+    fecha_nacimiento = models.DateField(null=True, blank=True)
     fecha_registro = models.DateTimeField(default=timezone.now)
 
     especialidad = models.ForeignKey('a_especialidades.Especialidad', on_delete=models.SET_NULL, null=True, blank=True)
-    establecimiento = models.ForeignKey('a_sucursales.Establecimiento', on_delete=models.PROTECT)
+    establecimiento = models.ForeignKey('a_sucursales.Establecimiento', on_delete=models.PROTECT, null=True, blank=True,)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

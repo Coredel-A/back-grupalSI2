@@ -40,7 +40,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
             'fecha_nacimiento', 'fecha_registro',
             'especialidad', 'especialidad_id',
             'establecimiento', 'establecimiento_id',
-            'grupos', 'is_activate', 'is_staff'
+            'grupos', 'is_active', 'is_staff', 'password'
         ]
 
         read_only_fields = ['fecha_registro']

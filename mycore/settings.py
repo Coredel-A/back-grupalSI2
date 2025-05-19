@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-(mmlasvu%3dmq#e3xz2j)n+u70lvg#j=2rr#%3h_*7mm#q(pum
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'a_usuarios',
     'a_sucursales',
     'a_especialidades',
+    'a_bitacora',
 ]
 
 REST_FRAMEWORK = {
@@ -53,6 +55,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ]
 }
 
 from datetime import timedelta
@@ -93,6 +98,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+     'a_bitacora.middleware.BitacoraMiddleware',
 ]
 
 ROOT_URLCONF = 'mycore.urls'

@@ -1,9 +1,11 @@
-from django.shortcuts import render
+from rest_framework import permissions
 from .models import Especialidad
 from .serializers import EspecialidadSerializer
-from rest_framework import viewsets
+from a_bitacora.base import BitacoraModelViewSet
 
-class EstablecimientoViewSet(viewsets.ModelViewSet):
+class EspecialidadViewSet(BitacoraModelViewSet):
     queryset = Especialidad.objects.all()
     serializer_class = EspecialidadSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    bitacora_modulo = "Especialidad"
 

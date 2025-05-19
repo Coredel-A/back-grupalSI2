@@ -8,13 +8,11 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import Group
 from django.db import transaction
 
-from .models import Usuario, Especialidad
-from .serializers import UsuarioSerializer, EspecialidadSerializer
+from .models import Usuario
+from .serializers import UsuarioSerializer
 
-class EspecialidadViewSet(viewsets.ModelViewSet):
-    queryset = Especialidad.objects.all()
-    serializer_class = EspecialidadSerializer
-    permission_classes = [permissions.IsAuthenticated]
+from a_bitacora.utils import RegistroBitacora
+from a_bitacora.decorators import registrar_accion
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -43,9 +41,36 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         usuario.set_password(password)
         usuario.save()
 
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
+        RegistroBitacora.registrar(
+            usuario=request.user,
+            accion=f"Creo usuario: {usuario.email}",
+            ip=ip
+        )
+        
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
+    def perform_update(self, serializer):
+        usuario = serializer.save()
+        ip = self.META.get('HTTP_X_FORWARDED_FOR', self.META.get('REMOTE_ADDR'))
+        RegistroBitacora.registrar(
+            usuario=self.request.user,
+            accion=f"Actualizo usuario: {usuario.email}",
+            ip=ip
+        )
+
+    def perform_destroy(self, instance):
+        email = instance.email
+        ip = self.request.META.get('HTTP_X_FORWARDED_FOR', self.request.META.get('REMOTE_ADDR'))
+        instance.delete()
+        RegistroBitacora.registrar(
+            usuario=self.request.user,
+            accion=f"Elimino usuario: {email}",
+            ip=ip
+        )
+
     @action(detail=True, methods=['post'])
+    @registrar_accion("Cambio password del usuari {pk}")
     def set_password(self, request, pk=None):
         usuairo = self.get_object()
         password = request.data.get('password')
@@ -61,6 +86,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         return Response({"message": "password actualizado correctamente"})
     
     @action(detail=True, methods=['post'])
+    @registrar_accion("Asigno grupo al usuario {pk}")
     def assign_group(self, request, pk=None):
 
         usuario = self.get_object()
@@ -75,6 +101,13 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         try:
             group = Group.objects.get(id=group_id)
             usuario.groups.add(group)
+
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
+            RegistroBitacora.registrar(
+                usuario=request.user,
+                accion=f"Asigno usuario {usuario.email} al grupo {group.name}",
+                ip=ip
+            )
             return Response(
                 {"message": f"Usuario asignado al grupo {group.name}"}
             )
@@ -88,7 +121,7 @@ class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        email = request.data.gat('email')
+        email = request.data.get('email')
         password = request.data.get('password')
 
         if not email or not password:
@@ -103,6 +136,12 @@ class LoginView(APIView):
             refresh = RefreshToken.for_user(user)
             user_serializer = UsuarioSerializer(user)
 
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
+            RegistroBitacora.registrar(
+                usuario=user,
+                accion=f"Inicio de sesion",
+                ip=ip
+            )
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
@@ -122,7 +161,7 @@ class RegisterView(APIView):
         serializer = UsuarioSerializer(data=request.data)
 
         if serializer.is_valid():
-            password = request.data.get('passwoerd')
+            password = request.data.get('password')
 
             if not password:
                 return Response(
@@ -137,6 +176,12 @@ class RegisterView(APIView):
 
             refresh = RefreshToken.for_user(usuario)
 
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
+            RegistroBitacora.registrar(
+                usuario=usuario,
+                accion="Auto-registro en el sistema",
+                ip=ip
+            )
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
@@ -151,6 +196,13 @@ class LogoutView(APIView):
     def post(self, request):
         try:
             refresh_token = request.data.get('refresh')
+
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
+            RegistroBitacora.registrar(
+                usuario=request.user,
+                accion="Cierre de sesion",
+                ip=ip
+            )
             token = RefreshToken(refresh_token)
             token.blacklist()
             return Response({
