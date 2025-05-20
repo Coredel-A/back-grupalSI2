@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'a_sucursales',
     'a_especialidades',
     'a_bitacora',
+    'a_pacientes',
 ]
 
 REST_FRAMEWORK = {
