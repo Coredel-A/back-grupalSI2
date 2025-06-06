@@ -12,6 +12,11 @@ class PacientesSerializer(serializers.ModelSerializer):
         queryset = Pacientes.objects.all(), source = 'beneficiario_de', write_only=True, required=False
     )
 
+    def validate(self, data):
+        instance = Pacientes(**data)
+        instance.full_clean()  # Esto llama a clean()
+        return data
+
     class Meta:
         model = Pacientes
         fields = [

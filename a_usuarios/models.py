@@ -1,6 +1,9 @@
+import json
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
+from rest_framework.decorators import api_view, permission_classes
+from a_roles.models import Rol
 
 class UsuarioManager(BaseUserManager):
     def create_user(self, email, nombre, apellido, password=None, **extra_fields):
@@ -37,6 +40,24 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     especialidad = models.ForeignKey('a_especialidades.Especialidad', on_delete=models.SET_NULL, null=True, blank=True)
     establecimiento = models.ForeignKey('a_sucursales.Establecimiento', on_delete=models.PROTECT, null=True, blank=True,)
 
+    rol = models.ForeignKey(Rol, on_delete=models.SET_NULL, null=True, blank=True)
+
+    @property
+    def permisos_dict(self):
+        permisos = {}
+        if not self.rol:
+            return permisos
+        for permiso in self.rol.permisos.all():
+            try:
+                accion, modulo = permiso.codename.split('_', 1)
+            except ValueError:
+                continue
+            if modulo not in permisos:
+                permisos[modulo] = {}
+            permisos[modulo][accion] = True
+        return permisos
+
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -48,6 +69,3 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.nombre} {self.apellido} ({self.email})"
     
-
-
-

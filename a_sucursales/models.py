@@ -5,9 +5,11 @@ import uuid
 class Establecimiento(models.Model):
     TIPO_CHOICES = [
         ('hospital', 'Hospital'),
-        ('clinica',' Clinica'),
+        ('clinica', 'Clínica'),
         ('consultorio', 'Consultorio'),
-        ('centroo_salud', 'Centro de Salud'),
+        ('centro_salud', 'Centro de Salud'),
+        ('laboratorio', 'Laboratorio'),
+        ('farmacia', 'Farmacia'),
     ]
 
     NIVEL_CHOICES = [

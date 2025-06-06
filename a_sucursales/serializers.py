@@ -1,9 +1,10 @@
 from rest_framework import serializers
 from .models import Establecimiento, SucursalEspecialidad
 from a_especialidades.models import Especialidad
+from a_especialidades.serializers import EspecialidadSerializer
 
 class EstablecimientoSerializer(serializers.ModelSerializer):
-    especialidades = serializers.PrimaryKeyRelatedField(
+    especialidades = EspecialidadSerializer(
         many=True,
         read_only=True
     )
@@ -15,10 +16,20 @@ class EstablecimientoSerializer(serializers.ModelSerializer):
         required=False
     )
     
+    tipo_establecimiento_display = serializers.SerializerMethodField()
+    nivel_display = serializers.SerializerMethodField()
+
     class Meta:
         model = Establecimiento
         fields = ['id', 'nombre', 'direccion', 'telefono', 'correo',
-                  'tipo_establecimiento', 'nivel', 'especialidades', 'especialidades_ids']
+                  'tipo_establecimiento', 'tipo_establecimiento_display',
+                    'nivel','nivel_display', 'especialidades', 'especialidades_ids']
+
+    def get_tipo_establecimiento_display(self, obj):
+        return obj.get_tipo_establecimiento_display()
+
+    def get_nivel_display(self, obj):
+        return obj.get_nivel_display()
 
     def create(self, validated_data):
         especialidades = validated_data.pop('especialidades_ids', [])
@@ -48,5 +59,9 @@ class EstablecimientoSerializer(serializers.ModelSerializer):
                     especialidad=especialidad
                 )
         return instance
-
+    
+class SucursalEspecialidadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SucursalEspecialidad
+        fields = '__all__'
 

@@ -1,8 +1,13 @@
 from rest_framework import viewsets
 from a_bitacora.utils import RegistroBitacora
+from rest_framework.permissions import IsAuthenticated
 
 class BitacoraModelViewSet(viewsets.ModelViewSet):
     bitacora_modulo = "General"
+    permission_classes = [IsAuthenticated]  # Por defecto
+
+    def get_permissions(self):
+        return [permission() for permission in self.permission_classes]
 
     def get_objeto_nombre(self, obj):
         for attr in ['nombre', 'titulo', 'name', 'title']:
