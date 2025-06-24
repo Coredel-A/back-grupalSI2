@@ -154,16 +154,29 @@ WSGI_APPLICATION = 'mycore.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': 'SI2ProyectoGrupal',
+#        'USER': 'postgres',
+#        'PASSWORD': '123456789',
+#        'HOST': 'localhost',
+#        'PORT': '5432',
+#    }
+#}
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'SI2ProyectoGrupal',
-        'USER': 'postgres',
-        'PASSWORD': '123456789',
-        'HOST': 'localhost',
+        'NAME': 'neondb',
+        'USER': 'neondb_owner',
+        'PASSWORD': 'npg_BCVw7Ge1hEvJ',
+        'HOST': 'ep-snowy-tooth-a5w3609u-pooler.us-east-2.aws.neon.tech',
         'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
-
 }
 
 AUTH_USER_MODEL = 'a_usuarios.Usuario'
