@@ -208,3 +208,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+import os
+
+# Ruta donde se almacenarán los archivos cargados
+MEDIA_URL = '/media/'
+
+# Ruta del sistema de archivos donde se guardan los archivos
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
