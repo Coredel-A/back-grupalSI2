@@ -112,7 +112,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "https://front-angula-si2.vercel.app",  # dominio exacto de tu frontend
-    "http://localhost:4200",  # para desarrollo local (opcional)
+    "http://localhost:4300",  # para desarrollo local (opcional)
 ]
 
 CORS_ALLOW_METHODS = [
